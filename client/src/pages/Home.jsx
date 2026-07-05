@@ -22,6 +22,7 @@ const blocks = [
   { tag: 'Made Better Together', title: 'Rooted In\nThe Land', sub: 'Chief Ravele\u2019s land in Dzwerani since 2007.' },
   { tag: 'Harvest Season', title: 'Beyond\nJust Tomatoes', sub: '32 cattle, 42 sheep, seasonal vegetables.' },
   { tag: 'BBBEE Level 1', title: 'From Our Soil\nTo Your Table', sub: 'Empowering Vhembe through jobs and skills.' },
+  { tag: 'Livestock', title: 'Cattle & Sheep\nFrom Our Fields', sub: '32 cattle, 42 sheep raised in Limpopo.' },
 ]
 
 export default function Home() {
@@ -55,15 +56,17 @@ export default function Home() {
     return () => clearInterval(timer)
   }, [next])
 
+  const badgeOrder = [3, 2, 5, 7]
   const sideBlocks = useMemo(() => {
     const isSmall = vpW < 640
-    const gap = Math.max(isSmall ? 25 : 18, Math.round(110 / vpH * 100))
-    const start = isSmall ? 22 : 22
-    return [
-      { blockIdx: 3, top: start, tickY: start },
-      { blockIdx: 2, top: start + gap, tickY: start + gap },
-      { blockIdx: 5, top: start + 2 * gap, tickY: start + 2 * gap },
-    ]
+    const start = 16
+    const end = 88
+    const gap = (end - start) / (badgeOrder.length - 1)
+    return badgeOrder.map((idx, i) => ({
+      blockIdx: idx,
+      top: start + i * gap,
+      tickY: start + i * gap,
+    }))
   }, [vpW, vpH])
 
   const connectorPoints = useMemo(() => {
@@ -161,12 +164,12 @@ export default function Home() {
           key={sb.blockIdx}
           className="absolute z-20"
           style={{
-            left: `${connectorPoints.mainX}%`,
+            left: `${connectorPoints.mainX + 2}%`,
             top: `${sb.tickY}%`,
           }}
         >
           <div style={{ transform: 'translateY(-50%)' }}>
-            <span className="inline-block bg-gold-500/90 text-green-950 text-[10px] md:text-[11px] font-bold uppercase tracking-wider rounded-full px-2.5 py-0.5 shadow-md shadow-black/30 backdrop-blur-sm whitespace-nowrap">
+            <span className="inline-block bg-gold-500/90 text-green-950 text-[9px] md:text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 shadow-md shadow-black/30 backdrop-blur-sm whitespace-nowrap">
               {blocks[sb.blockIdx].tag}
             </span>
           </div>
@@ -175,8 +178,10 @@ export default function Home() {
               <><strong className="text-green-50">Protected growing for better quality.</strong>{' '}<span className="text-white/70">Year-round consistency from our shade‑net system — cleaner crops, reliable supply.</span></>
             ) : sb.blockIdx === 2 ? (
               <><strong className="text-green-50">Proudly South African —</strong>{' '}<span className="text-white/70">every hand on this farm is local. Our supply chain creates jobs, builds skills, and strengthens the local community.</span></>
-            ) : (
+            ) : sb.blockIdx === 5 ? (
               <><strong className="text-green-50">Grown to your demand.</strong>{' '}<span className="text-white/70">We plan planting cycles around what you need — fresh produce when your business requires it.</span></>
+            ) : (
+              <><strong className="text-green-50">Cattle & sheep from Limpopo.</strong>{' '}<span className="text-white/70">32 cattle, 42 sheep. Quality livestock raised on our land — healthy animals, trusted supply.</span></>
             )}
           </p>
         </div>
@@ -190,7 +195,7 @@ export default function Home() {
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <linearGradient id="goldFade" gradientUnits="userSpaceOnUse" x1="0" y1={connectorPoints.bridgeY} x2="0" y2={connectorPoints.ticks[0]}>
+          <linearGradient id="goldFade" gradientUnits="userSpaceOnUse" x1="0" y1={connectorPoints.bridgeY} x2="0" y2={connectorPoints.ticks[connectorPoints.ticks.length - 1]}>
             <stop offset="0%" stopColor="#C9922A" stopOpacity="0.8" />
             <stop offset="100%" stopColor="#C9922A" stopOpacity="0" />
           </linearGradient>
@@ -202,7 +207,7 @@ export default function Home() {
         <polyline
           points={connectorPoints.path}
           stroke="#1E4D2B"
-          strokeWidth="0.8"
+          strokeWidth="1.0"
           fill="none"
           strokeLinecap="round"
           strokeLinejoin="round"
@@ -211,7 +216,7 @@ export default function Home() {
           x1={connectorPoints.mainX}
           y1={connectorPoints.bridgeY}
           x2={connectorPoints.mainX}
-          y2={connectorPoints.ticks[0]}
+          y2={connectorPoints.ticks[connectorPoints.ticks.length - 1]}
           stroke="url(#goldFade)"
           strokeWidth="0.5"
           strokeLinecap="round"
@@ -225,7 +230,36 @@ export default function Home() {
           strokeWidth="0.5"
           strokeLinecap="round"
         />
-{/* Green dots replaced by gold badge nodes above */}
+        {connectorPoints.ticks.map((t, i) => {
+          const total = connectorPoints.ticks.length - 1 || 1
+          const mix = i / total
+          const r = Math.round(0xC9 + (0x1E - 0xC9) * mix)
+          const g = Math.round(0x92 + (0x4D - 0x92) * mix)
+          const b = Math.round(0x2A + (0x2B - 0x2A) * mix)
+          const color = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+          return (
+            <g key={t}>
+              <line
+                x1={connectorPoints.mainX}
+                y1={t}
+                x2={connectorPoints.mainX + 2}
+                y2={t}
+                stroke={color}
+                strokeWidth="1.0"
+                opacity="0.5"
+              />
+              <circle
+                cx={connectorPoints.mainX}
+                cy={t}
+                r="0.5"
+                fill="none"
+                stroke={color}
+                strokeWidth="0.3"
+                opacity="0.7"
+              />
+            </g>
+          )
+        })}
       </svg>
 
       {/* #4 HEADLINE — center, large */}
