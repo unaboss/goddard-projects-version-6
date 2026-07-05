@@ -59,8 +59,8 @@ export default function Home() {
   const badgeOrder = [3, 2, 5, 7]
   const sideBlocks = useMemo(() => {
     const isSmall = vpW < 640
-    const start = 16
-    const end = 88
+    const start = 18
+    const end = 78
     const gap = (end - start) / (badgeOrder.length - 1)
     return badgeOrder.map((idx, i) => ({
       blockIdx: idx,
@@ -159,7 +159,15 @@ export default function Home() {
       </div>
 
       {/* Badge nodes — positioned on the SVG pathway */}
-      {sideBlocks.map((sb) => (
+      {sideBlocks.map((sb, i) => {
+        const total = sideBlocks.length - 1 || 1
+        const mix = i / total
+        const r = Math.round(0xC9 + (0x1E - 0xC9) * mix)
+        const g = Math.round(0x92 + (0x4D - 0x92) * mix)
+        const b = Math.round(0x2A + (0x2B - 0x2A) * mix)
+        const badgeBg = `rgb(${r},${g},${b})`
+        const isGreen = mix > 0.5
+        return (
         <div
           key={sb.blockIdx}
           className="absolute z-20"
@@ -169,7 +177,10 @@ export default function Home() {
           }}
         >
           <div style={{ transform: 'translateY(-50%)' }}>
-            <span className="inline-block bg-gold-500/90 text-green-950 text-[9px] md:text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 shadow-md shadow-black/30 backdrop-blur-sm whitespace-nowrap">
+            <span
+              className={`inline-block text-[9px] md:text-[10px] font-bold uppercase tracking-wider rounded-full px-2 py-0.5 shadow-md shadow-black/30 backdrop-blur-sm whitespace-nowrap ${isGreen ? 'text-white' : 'text-green-950'}`}
+              style={{ backgroundColor: badgeBg }}
+            >
               {blocks[sb.blockIdx].tag}
             </span>
           </div>
@@ -185,7 +196,8 @@ export default function Home() {
             )}
           </p>
         </div>
-      ))}
+      )
+    })}
 
       {/* Connector lines — continuous SVG pathway */}
       <svg
