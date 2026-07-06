@@ -59,8 +59,8 @@ export default function Home() {
   const badgeOrder = [3, 2, 5, 7]
   const sideBlocks = useMemo(() => {
     const isSmall = vpW < 640
-    const start = 18
-    const end = 78
+    const start = 22
+    const end = 67
     const gap = (end - start) / (badgeOrder.length - 1)
     return badgeOrder.map((idx, i) => ({
       blockIdx: idx,
